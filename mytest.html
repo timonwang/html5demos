@@ -1,0 +1,122 @@
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8"> 
+<style>
+div{width:20px;height:20px;border:1px solid #000;position:absolute}
+</style>
+<script>
+var $ = function(o){ return document.getElementById(o)};
+var SpriteEngine = {//动画引擎，由动画引擎调度所有的动画对象
+					sprites : {},//动画对象字典
+					frame : 30,//每秒30帧
+					timer : null ,//动画计时器
+					register: function(spriteObj){//注册动画对象
+						if(spriteObj.id && ! this.sprites[spriteObj.id]){
+							this.sprites[spriteObj.id] = spriteObj;
+						}
+					},
+					unRegister:function(spriteObj){//删除动画对象
+						if(spriteObj.id){
+							delete this.sprites[spriteObj.id];
+						}
+					},
+					startFrame : function(){//开始动画
+						this.timer = setInterval(this.enterFrameFunction, 1000 / this.frame);
+					},
+					stopFrame : function(){//暂停动画
+						if(this.timer)
+							clearInterval(this.timer);
+					},
+					enterFrameFunction : function(){//内部启动方法
+						var sprites = SpriteEngine.sprites;
+						for(var key in sprites){
+							var sprite = sprites[key];
+							//$("debug").innerHTML += sprite.id;
+							if(sprite.id && sprite.enterFrame){//检查是否是Sprite的接口实例
+								sprite.enterFrame(1000 / SpriteEngine.frame);
+							}
+						}
+					}
+				};
+/**
+ * 动画对象
+ * 设定内部接口为
+ *		id 动画对象的标识
+ *		enterFrame 由动画引擎调用
+ * 外部接口为
+ *		addEnterFrameFunction 设定动画对象的运动函数
+ */
+var Sprite = function(id,speed,direction){
+	this.id = id;//接口，必须有ＩＤ，内部接口
+	this.x = 0;
+	this.y = 0;
+	this.dom  = $(id);
+	this.speed = speed;//运动的速度，每毫秒多少像素
+	this.direction = direction;//运动的角度，单位弧度
+	this.enterFrameFun = [];//动画方程列表
+	SpriteEngine.register(this);
+	if(this.dom){//初始化位置
+		this.dom.style.top = 0;
+		this.dom.style.left = 0;
+	}
+};
+Sprite.prototype.setXY = function(x, y){//设置内部dom位置，这个仅仅是演示用的，不算Sprite的接口
+	this.x = x;
+	this.y = y;
+	if(this.dom){
+		this.dom.style.top = y + 'px';
+		this.dom.style.left = x + 'px';
+	}
+}
+Sprite.prototype.addEnterFrameFunction = function(fun){//添加动画的方法接口，外部接口
+	this.enterFrameFun.push(fun);
+};
+Sprite.prototype.enterFrame = function(stepTime){//引擎调用的接口,内部接口
+	for(var i = this.enterFrameFun.length; i--; ){
+		this.enterFrameFun[i].call(this,stepTime);
+	}
+};
+var movefun1 = function(stepTime){//demo 直线运动
+	var move = this.speed * stepTime
+	var _x = move * Math.cos(this.direction);
+	var _y = move * Math.sin(this.direction);
+	this.setXY(this.x + _x, this.y + _y);
+}
+var movefun2 = function(stepTime){//demo 给定一个角速度
+	this.direction += 0.1;
+}
+var movefun3 = function(stepTime){//demo 往复运动
+	if (this.x > 500){
+		this.direction =  Math.PI;
+	}
+	if(this.x < 50){
+		this.direction = 0;
+	}
+}
+function init(){
+	var a = new Sprite("demo1", 0.5, 0);
+	var b = new Sprite("demo2", 0.3, 30);
+	a.setXY(20,100);//直线运动，叠加往复运动
+	a.addEnterFrameFunction(movefun1);
+	a.addEnterFrameFunction(movefun3);
+	b.setXY(100,200);//直线运动，叠加角速度
+	b.addEnterFrameFunction(movefun1);
+	b.addEnterFrameFunction(movefun2);
+}
+function pauseOrStart(o){
+	if(o.value == '暂停'){
+		o.value = '开始'
+		SpriteEngine.stopFrame();
+	}else{
+		o.value = '暂停';
+		SpriteEngine.startFrame();
+	}
+}
+</script>
+</head>
+<body onload="init()">
+	<div id="demo1"></div>
+	<div id="demo2"></div>
+	<input type="button" value="开始" onclick="pauseOrStart(this)" />
+</body>
+</html>

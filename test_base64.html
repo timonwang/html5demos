@@ -1,0 +1,154 @@
+<head>
+	<SCRIPT   LANGUAGE= "JavaScript">
+		String.prototype.UTF16To8 = function() {
+	var str = this;
+	var ret = "", i, len, charCode;
+	len = str.length;
+	for (i = 0; i < len; i++) {
+		charCode = str.charCodeAt(i);
+		if ((charCode >= 0x0001) && (charCode <= 0x007F)) {
+			ret += str.charAt(i);
+		} else if (charCode > 0x07FF) {
+			ret += String.fromCharCode(0xE0 | ((charCode >> 12) & 0x0F));
+			ret += String.fromCharCode(0x80 | ((charCode >> 6) & 0x3F));
+			ret += String.fromCharCode(0x80 | ((charCode >> 0) & 0x3F));
+		} else {
+			ret += String.fromCharCode(0xC0 | ((charCode >> 6) & 0x1F));
+			ret += String.fromCharCode(0x80 | ((charCode >> 0) & 0x3F));
+		}
+	}
+	return ret;
+}
+String.prototype.UTF8To16 = function() {
+	var str = this;
+	var ret = "", i = 0, len, charCode;
+	var charCode2, charCode3;
+	len = str.length;
+	while (i < len) {
+		charCode = str.charCodeAt(i++);
+		switch (charCode >> 4) {
+			case 0 :
+			case 1 :
+			case 2 :
+			case 3 :
+			case 4 :
+			case 5 :
+			case 6 :
+			case 7 :
+				ret += str.charAt(i - 1);
+				break;
+			case 12 :
+			case 13 :
+				charCode2 = str.charCodeAt(i++);
+				ret += String.fromCharCode(((charCode & 0x1F) << 6)
+						| (charCode2 & 0x3F));
+				break;
+			case 14 :
+				charCode2 = str.charCodeAt(i++);
+				charCode3 = str.charCodeAt(i++);
+				ret += String
+						.fromCharCode(((charCode & 0x0F) << 12)
+								| ((charCode2 & 0x3F) << 6)
+								| ((charCode3 & 0x3F) << 0));
+				break;
+		}
+	}
+	return ret;
+}
+String.prototype.EncodeBase64 = function() {
+	var str = this;
+	str = str.UTF16To8();
+	var base64EncodeChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	var ret = "", i = 0, len;
+	var charCode1, charCode2, charCode3;
+	len = str.length;
+	while (i < len) {
+		charCode1 = str.charCodeAt(i++) & 0xff;
+		if (i == len) {
+			ret += base64EncodeChars.charAt(charCode1 >> 2);
+			ret += base64EncodeChars.charAt((charCode1 & 0x3) << 4);
+			ret += "==";
+			break;
+		}
+		charCode2 = str.charCodeAt(i++);
+		if (i == len) {
+			ret += base64EncodeChars.charAt(charCode1 >> 2);
+			ret += base64EncodeChars.charAt(((charCode1 & 0x3) << 4)
+					| ((charCode2 & 0xF0) >> 4));
+			ret += base64EncodeChars.charAt((charCode2 & 0xF) << 2);
+			ret += "=";
+			break;
+		}
+		charCode3 = str.charCodeAt(i++);
+		ret += base64EncodeChars.charAt(charCode1 >> 2);
+		ret += base64EncodeChars.charAt(((charCode1 & 0x3) << 4)
+				| ((charCode2 & 0xF0) >> 4));
+		ret += base64EncodeChars.charAt(((charCode2 & 0xF) << 2)
+				| ((charCode3 & 0xC0) >> 6));
+		ret += base64EncodeChars.charAt(charCode3 & 0x3F);
+	}
+	return ret;
+}
+String.prototype.DecodeBase64 = function() {
+	var str = this;
+	str = str.UTF16To8();
+	var base64DecodeChars = new Array(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62,
+			-1, -1, -1, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1,
+			-1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+			15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1, -1,
+			26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
+			43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1);
+	var charCode1, charCode2, charCode3, charCode4;
+	var ret = "", i = 0, len;
+	len = str.length;
+	while (i < len) {
+		do {
+			charCode1 = base64DecodeChars[str.charCodeAt(i++) & 0xff];
+		} while (i < len && charCode1 == -1);
+		if (charCode1 == -1)
+			break;
+		do {
+			charCode2 = base64DecodeChars[str.charCodeAt(i++) & 0xff];
+		} while (i < len && charCode2 == -1);
+		if (charCode2 == -1)
+			break;
+		ret += String
+				.fromCharCode((charCode1 << 2) | ((charCode2 & 0x30) >> 4));
+		do {
+			charCode3 = str.charCodeAt(i++) & 0xff;
+			if (charCode3 == 61)
+				return ret;
+			charCode3 = base64DecodeChars[charCode3];
+		} while (i < len && charCode3 == -1);
+		if (charCode3 == -1)
+			break;
+		ret += String.fromCharCode(((charCode2 & 0XF) << 4)
+				| ((charCode3 & 0x3C) >> 2));
+		do {
+			charCode4 = str.charCodeAt(i++) & 0xff;
+			if (charCode4 == 61)
+				return ret;
+			charCode4 = base64DecodeChars[charCode4];
+		} while (i < len && charCode4 == -1);
+		if (charCode4 == -1)
+			break;
+		ret += String.fromCharCode(((charCode3 & 0x03) << 6) | charCode4);
+	}
+	return ret;
+}
+
+window.onload = function(){
+	var parseEle = document.getElementById('trans_me');
+	parseEle.innerHTML = parseEle.innerHTML.DecodeBase64();
+	alert(document.Charset);
+}
+</SCRIPT> 
+</head>
+<body>
+	<div id="trans_me">R0lGODlhDwAPAKECAAAAzMzM/////wAAACwAAAAADwAPAAACIISPeQHsrZ5ModrLlN48CXF8m2iQ3YmmKqVlRtW4MLwWACH+H09wdGltaXplZCBieSBVbGVhZCBTbWFydFNhdmVyIQAAOw==</div>
+	<img src="data:image/gif;base64,R0lGODlhDwAPAKECAAAAzMzM/////wAAACwAAAAADwAPAAACIISPeQHsrZ5ModrLlN48CXF8m2iQ3YmmKqVlRtW4MLwWACH+H09wdGltaXplZCBieSBVbGVhZCBTbWFydFNhdmVyIQAAOw==" alt="Base64 encoded image" width="150" height="150"/>  
+
+</body>
+	
