@@ -1,0 +1,78 @@
+html {
+	font-size: 12px;
+}
+header, footer , #content {
+	width: 960px;
+}
+#content {
+	height: 600px;
+}
+#content section {
+	width: 360px;
+	display: inline;
+	float:left;
+	padding: 2px 5px;
+}
+aside {
+	padding: 2px 5px;
+	width: 180px;
+	float: right;
+	border: #13ACEB solid 1px;
+}
+header, #content, footer {
+	margin: 8px auto;
+	border-width: 1px;
+	border-style: dotted;
+}
+header, nav, aside, section, footer {
+	display: block;
+}
+header {
+	border-color: #ccff00;
+}
+nav {
+	width: 100%;
+	font-size: 18px;
+}
+footer {
+	text-align: center;
+}
+nav {
+	padding: 0px;
+	margin: 0px;
+}
+nav ul {
+	list-style: none;
+	height: 26px;
+}
+nav ul li {
+	height: 26px;
+	line-height: 26px;
+	color: #006699;
+	font-weight: bold;
+	padding-left: 2px;
+	-moz-opacity: 0.9;
+	-moz-border-radius: 3px;
+	-webkit-opacity: 0.9;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+	background-color: #669900;
+	display: inline;
+	padding: 4px 12px;
+	padding-top: 6px;
+	width: 150px;
+	margin-left: 2px;
+}
+nav ul li.seleted {
+	background: #9ADD19 !important;
+}
+nav ul li:hover {
+	cursor: pointer;
+	background: #9ADD19 !important;
+}
+
+.clearfix {
+	height: 0px;
+	clear: both;
+	display: block;
+}

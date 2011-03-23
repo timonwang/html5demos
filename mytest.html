@@ -1,122 +1,78 @@
 <html>
-<head>
-<meta http-equiv="content-type" content="text/html;charset=UTF-8"> 
-<style>
-div{width:20px;height:20px;border:1px solid #000;position:absolute}
-</style>
-<script>
-var $ = function(o){ return document.getElementById(o)};
-var SpriteEngine = {//�������棬�ɶ�������������еĶ�������
-					sprites : {},//���������ֵ�
-					frame : 30,//ÿ��30֡
-					timer : null ,//������ʱ��
-					register: function(spriteObj){//ע�ᶯ������
-						if(spriteObj.id && ! this.sprites[spriteObj.id]){
-							this.sprites[spriteObj.id] = spriteObj;
-						}
-					},
-					unRegister:function(spriteObj){//ɾ����������
-						if(spriteObj.id){
-							delete this.sprites[spriteObj.id];
-						}
-					},
-					startFrame : function(){//��ʼ����
-						this.timer = setInterval(this.enterFrameFunction, 1000 / this.frame);
-					},
-					stopFrame : function(){//��ͣ����
-						if(this.timer)
-							clearInterval(this.timer);
-					},
-					enterFrameFunction : function(){//�ڲ���������
-						var sprites = SpriteEngine.sprites;
-						for(var key in sprites){
-							var sprite = sprites[key];
-							//$("debug").innerHTML += sprite.id;
-							if(sprite.id && sprite.enterFrame){//����Ƿ���Sprite�Ľӿ�ʵ��
-								sprite.enterFrame(1000 / SpriteEngine.frame);
-							}
-						}
-					}
-				};
-/**
- * ��������
- * �趨�ڲ��ӿ�Ϊ
- *		id ��������ı�ʶ
- *		enterFrame �ɶ����������
- * �ⲿ�ӿ�Ϊ
- *		addEnterFrameFunction �趨����������˶�����
- */
-var Sprite = function(id,speed,direction){
-	this.id = id;//�ӿڣ������Уɣģ��ڲ��ӿ�
-	this.x = 0;
-	this.y = 0;
-	this.dom  = $(id);
-	this.speed = speed;//�˶����ٶȣ�ÿ�����������
-	this.direction = direction;//�˶��ĽǶȣ���λ����
-	this.enterFrameFun = [];//���������б�
-	SpriteEngine.register(this);
-	if(this.dom){//��ʼ��λ��
-		this.dom.style.top = 0;
-		this.dom.style.left = 0;
-	}
-};
-Sprite.prototype.setXY = function(x, y){//�����ڲ�domλ�ã������������ʾ�õģ�����Sprite�Ľӿ�
-	this.x = x;
-	this.y = y;
-	if(this.dom){
-		this.dom.style.top = y + 'px';
-		this.dom.style.left = x + 'px';
-	}
-}
-Sprite.prototype.addEnterFrameFunction = function(fun){//���Ӷ����ķ����ӿڣ��ⲿ�ӿ�
-	this.enterFrameFun.push(fun);
-};
-Sprite.prototype.enterFrame = function(stepTime){//������õĽӿ�,�ڲ��ӿ�
-	for(var i = this.enterFrameFun.length; i--; ){
-		this.enterFrameFun[i].call(this,stepTime);
-	}
-};
-var movefun1 = function(stepTime){//demo ֱ���˶�
-	var move = this.speed * stepTime
-	var _x = move * Math.cos(this.direction);
-	var _y = move * Math.sin(this.direction);
-	this.setXY(this.x + _x, this.y + _y);
-}
-var movefun2 = function(stepTime){//demo ����һ�����ٶ�
-	this.direction += 0.1;
-}
-var movefun3 = function(stepTime){//demo �����˶�
-	if (this.x > 500){
-		this.direction =  Math.PI;
-	}
-	if(this.x < 50){
-		this.direction = 0;
-	}
-}
-function init(){
-	var a = new Sprite("demo1", 0.5, 0);
-	var b = new Sprite("demo2", 0.3, 30);
-	a.setXY(20,100);//ֱ���˶������������˶�
-	a.addEnterFrameFunction(movefun1);
-	a.addEnterFrameFunction(movefun3);
-	b.setXY(100,200);//ֱ���˶������ӽ��ٶ�
-	b.addEnterFrameFunction(movefun1);
-	b.addEnterFrameFunction(movefun2);
-}
-function pauseOrStart(o){
-	if(o.value == '��ͣ'){
-		o.value = '��ʼ'
-		SpriteEngine.stopFrame();
-	}else{
-		o.value = '��ͣ';
-		SpriteEngine.startFrame();
-	}
-}
-</script>
-</head>
-<body onload="init()">
-	<div id="demo1"></div>
-	<div id="demo2"></div>
-	<input type="button" value="��ʼ" onclick="pauseOrStart(this)" />
-</body>
+	<head>
+		<title>This is a test page, which you will never used in your product.</title><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta http-equiv="content-type" content="text/html;charset=UTF-8">
+		<link rel="stylesheet" href="style.css" type="text/css" media="all" title="no title" charset="utf-8"/>
+		<script type="text/javascript" src="modernizr-1.5.min.js">
+		</script>
+	</head>
+	<body>
+		<header>
+			<nav>
+				<ul>
+					<li class="seleted">
+						<span>首页</span>
+					</li>
+					<li>
+						<span>门窗定制</span>
+					</li>
+					<li>
+						<span>铝合金</span>
+					</li>
+					<li>
+						<span>钛合金</span>
+					</li>
+					<li>
+						<span>关于我们</span>
+					</li>
+				</ul>
+			</nav>
+		</header>
+		<div id="content">
+			<section>
+				<article>
+					<div class="title">
+						本站点正在开发中
+					</div>
+					<div class="general">
+						本站点采用HTML5页面标签进行设计，主要考虑到语义化的web界面设计，给用户带来不一样的体验，当然只能在现代浏览器（Chrome/Firefox/Opera/Safri）上有特殊效果。
+					</div>
+				</article>
+				<article>
+					<div class="title">
+						本站点正在开发中
+					</div>
+					<div class="general">
+						本站点采用HTML5页面标签进行设计，主要考虑到语义化的web界面设计，给用户带来不一样的体验，当然只能在现代浏览器（Chrome/Firefox/Opera/Safri）上有特殊效果。
+					</div>
+				</article>
+				<div class="clearfix">
+				<article>
+					<div class="title">
+						本站点正在开发中
+					</div>
+					<div class="general">
+						本站点采用HTML5页面标签进行设计，主要考虑到语义化的web界面设计，给用户带来不一样的体验，当然只能在现代浏览器（Chrome/Firefox/Opera/Safri）上有特殊效果。
+					</div>
+				</article>
+				<article>
+					<div class="title">
+						本站点正在开发中
+					</div>
+					<div class="general">
+						本站点采用HTML5页面标签进行设计，主要考虑到语义化的web界面设计，给用户带来不一样的体验，当然只能在现代浏览器（Chrome/Firefox/Opera/Safri）上有特殊效果。
+					</div>
+				</article>
+			</section>
+			<aside>
+				<div>
+					此处安放广告？
+				</div>
+			</aside>
+		</div>
+		<footer>
+			<div>
+				幸福门窗 &copy; 2010-2011 All Rights Reserved.
+			</div>
+		</footer>
+	</body>
 </html>
