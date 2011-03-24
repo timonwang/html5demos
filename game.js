@@ -14,6 +14,9 @@ function handle_bg_message (data) {
 	console.log(data);
 }
 
+/**
+ * 加载游戏地图
+ */
 function load_game_map () {
 	draw_tree();
 	draw_road();
@@ -34,6 +37,10 @@ window.onload = function() {
 	}
 	load_game_map();
 }
+
+/**
+ * 画树
+ */
 function draw_tree() {
 	if(!context) {
 		alert('Context init failed.');
@@ -49,11 +56,19 @@ function draw_tree() {
 	context.fillStyle = '#339900';
 	context.fill();
 	context.stroke();
-	context.fillStyle = '#663300';
+	//利用渐变来填充树干
+	var truckGradient = context.createLinearGradient(-5, -50, 10, 30);
+	truckGradient.addColorStop(0, '#663300');
+	truckGradient.addColorStop(0.4, '#996600');
+	truckGradient.addColorStop(1, '#552200');
+	context.fillStyle = truckGradient;
 	context.fillRect(-5, -50, 10, 30);
 	context.restore();
 }
 
+/**
+ * 创建树冠的外观
+ */
 function createCanopyPath(context) {
 	context.beginPath();
 	context.moveTo(0, -50);
@@ -74,6 +89,9 @@ function createCanopyPath(context) {
 	context.closePath();
 }
 
+/**
+ * 画出一条模拟的树
+ */
 function draw_road() {
 	context.save();
 	context.translate(-10, 350);

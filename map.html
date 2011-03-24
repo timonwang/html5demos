@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="processing.js"></script>
+  <script src="init.js"></script>
+ 
+</head>
+<body>
+<script type="application/processing">
+
+Piece[][] ps;
+int mapHSize = mapWSize = 20;
+float y = x = 50;
+int ph = pw = 20;
+int step = 5;
+
+
+void setup() {
+	size(200,200);
+	frameRate(0);
+	smooth();
+	init();
+	//noLoop();
+}
+
+void draw() {
+	background(0);
+	render();
+	offset();
+}
+
+void init(){ 
+	
+	ps = new Piece[mapHSize][mapWSize];
+	for(int i = 0 ; i < mapHSize ;i++){
+		for( int j = 0 ; j < mapWSize ; j++){
+			int itype = random(0, 3);
+			if(i == 0 || j == 0 || i == mapHSize - 1 || j == mapWSize - 1){
+				itype = 4;
+			}
+			int istate = 0;
+			int ilevel = 1;
+			ps[i][j] = new Piece(pw,pw,itype,istate,ilevel,j*pw,i*pw);
+		}
+	}
+}
+
+
+
+void offset(){
+	
+	if(enable){
+		if(mouseX >= width - pw*2){
+			x += abs(step * sin(a));
+		}else if( mouseX  <=  pw*2){
+			x -= abs(step * sin(a));
+		}
+
+		if(mouseY >= height - ph*2){
+			y += abs(step * cos(a));
+		}else if(mouseY <= ph*2){
+			y -= abs(step * cos(a));
+		}
+		
+	}
+	
+
+}
+
+boolean enable;
+float a;
+void mouseMoved() {
+	a = atan2(mouseX-width/2,mouseY-height/2);
+	if((mouseX >= width - pw*2)||(mouseX  <=  pw*2)||(mouseY > height - pw*2)||(mouseY <= pw*2)){
+		if(mouseX >= width - pw*2){
+			if(mouseY <= pw*2){
+				//右上
+				cursor('ne-resize');
+			}else if(mouseY > height - pw*2){
+				//右下
+				cursor('se-resize');
+			}else{
+				//右
+				cursor('e-resize');
+			}
+		}else if(mouseX  <=  pw*2){
+			if(mouseY <= pw*2){
+				//左上
+				cursor('nw-resize');
+			}else if(mouseY > height - pw*2){
+				//左下
+				cursor('sw-resize');
+			}else{
+				//左
+				cursor('w-resize');
+			}
+		}else if(mouseY <= pw*2){
+			//上
+			cursor('n-resize')
+		}else if(mouseY > height - pw*2){
+			//下
+			cursor('s-resize')
+		}
+		enable = true;
+	}else{
+		cursor('default')
+		enable = false;
+	}
+
+}
+
+void render(){
+	for(int i = floor(y / pw),h = ceil((y + height)/pw); i < h ;i++){
+		for(int j = floor(x / pw),w = ceil((x + width)/pw); j < w ; j++){
+			if(ps[i] && ps[i][j]){
+				int r = ceil(ps[i][j].type) == 0 ? 255 : 58;
+				int g = ceil(ps[i][j].type) == 1 ? 255 : 79;
+				int b = ceil(ps[i][j].type) == 2 ? 255 : 112;
+				if(ceil(ps[i][j].type) == 4){
+					r = 255;
+					g = 0;
+					b = 0;
+				}
+				//int a = p.state
+				fill(r, g, b);
+				rect((ps[i][j].x - x) , (ps[i][j].y - y),  ps[i][j].width ,ps[i][j].height);
+			}
+				
+		}
+	}	  
+}
+
+class Piece{
+	int height;
+	int width;
+	int type;
+	int state;
+	int level;
+	int x;
+	int y;
+
+	Piece(int iheight, int iwidth , int itype, int istate , int ilevel,int ix, int iy ){
+		height = iheight;
+		width = iwidth;
+		type = itype;
+		state = istate;
+		level = ilevel;
+		x = ix; 
+		y = iy;
+	}
+}
+</script>
+<canvas width="200" height="200"></canvas>
+</body>
+</html>
